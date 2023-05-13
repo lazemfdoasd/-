@@ -10,7 +10,9 @@ from pygame.locals import *
 click = False
  
 
-#запуск музыки
+ #запуск музыки
+
+
 mixer.init()
 mixer.music.load('space.ogg')
 mixer.music.play()
@@ -132,6 +134,7 @@ class Enemy(pygame.sprite.Sprite): #класс врагов
             self.rect.y = random.randint(-100, -40)
             self.speed_padenia = random.randint(1, 5)
             lost += 1 
+    
 
 
 class Bullet(pygame.sprite.Sprite): #класс пули
@@ -277,21 +280,25 @@ for i in range(5): #создание монстров
 
 collide = False #переключатель столкновения
 
+lose = 0
+
+
+
 running = True #переключатель отвечающий за продолжение игры
 def collide_func(): #функция с помощью которой отнимается хп
     global count_collide
     global running
+    global lose
+
     if count_collide == 2:
         if pygame.sprite.groupcollide(enemies, player_g, True, False):
+            lose = 1
+
+        elif lose == 1:
             screen.blit(hp3, (player.rect.x - 45, player.rect.y - 40))
-            running = False   
-            enemy = Enemy()
-            all_sprites.add(enemy)
-            enemies.add(enemy)
-            main_menu()
-            if score > max_score:
-                with open('records.json', 'w', encoding='utf-8') as f:    
-                    json.dump(records, f, ensure_ascii=False)
+            draw_text(screen,'Вы проиграли :(', 70, WIDTH/2, HEIGHT/2-50)
+            draw_text(screen,'Ваши очки:' + ' ' + str(score), 30, WIDTH/2, HEIGHT/2-100)
+
         else:
             screen.blit(hp2, (player.rect.x - 45, player.rect.y - 40))
     if count_collide == 1:
@@ -383,7 +390,17 @@ def game():
 
         healths = pygame.sprite.groupcollide(player_g, health_g, False, False)
 
-
+        print(lose)
+        if lose == 1:            
+            if score > max_score:
+                with open('records.json', 'w', encoding='utf-8') as f:    
+                    json.dump(records, f, ensure_ascii=False) 
+            for event in pygame.event.get(): 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == K_ESCAPE:
+                            running = False
+                            main_menu()
+            update = False   
 
 
 
@@ -427,20 +444,20 @@ def game():
             upgrade.rect.x = random.randint(0, 550)
             upgrade.rect.y = 0
             countdown = 10
-            generator = 3
+            generator = random.randint(1, 3)
             otrisovka1 = True
         if countdown == 0 and generator == 2:
             health1.rect.x = random.randint(0, 550)
             health1.rect.y = 0
             countdown = 10
-            generator = 3
+            generator = random.randint(1, 3)
             otrisovka2 = True
 
         if countdown == 0 and generator == 3:
             icon_shield.rect.x = random.randint(0, 550)
             icon_shield.rect.y = 0
             countdown = 10
-            generator = 3
+            generator = random.randint(1, 3)
             otrisovka3 = True
             
 
@@ -535,6 +552,7 @@ def game():
 def main_menu():
     while True:
         global generator
+        global lose
         global update
         global perekluchatel
         global running
@@ -546,6 +564,7 @@ def main_menu():
         global count_collide
         global running
         global click
+
         screen.blit(prewiew, (0, 0))
         draw_text(screen, 'Меню', 30, 400, 40)
 
@@ -568,6 +587,7 @@ def main_menu():
             if click:
                 generator = random.randint(1, 2)
                 update = True
+                lose = 0
                 perekluchatel = False
                 score = 0
                 upgrade_ship = False
@@ -576,6 +596,7 @@ def main_menu():
                 countdown = 10
                 count_collide = 0
                 game()
+
 
 
         pygame.draw.rect(screen, (100, 0, 150), button_1)
