@@ -10,8 +10,10 @@ from pygame.locals import *
 click = False
  
 
- #запуск музыки
+#запуск музыки
 mixer.init()
+mixer.music.load('space.ogg')
+mixer.music.play()
 fire = mixer.Sound('fire.ogg')
 
 def draw_text(screen, text, size, x, y): #функиция для отрисовки текста
