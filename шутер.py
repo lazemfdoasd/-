@@ -134,7 +134,7 @@ class Enemy(pygame.sprite.Sprite): #класс врагов
             self.rect.y = random.randint(-100, -40)
             self.speed_padenia = random.randint(1, 5)
             lost += 1 
-    
+
 
 
 class Bullet(pygame.sprite.Sprite): #класс пули
@@ -344,7 +344,7 @@ otrisovka1 = False
 otrisovka2 = False
 otrisovka3 = False
 
-
+one = 1
 
 max_score = records['score']
 
@@ -372,7 +372,7 @@ def game():
     global countdown
     global count_collide
     global click
-
+    global one 
     while running != False: #цикл игры
         records = {'score':score}
         click = False
@@ -390,8 +390,12 @@ def game():
 
         healths = pygame.sprite.groupcollide(player_g, health_g, False, False)
 
-        print(lose)
         if lose == 1:            
+            if one == 1:
+                enemy = Enemy()
+                enemies.add(enemy)
+                all_sprites.add(enemy)
+                one -= 1
             if score > max_score:
                 with open('records.json', 'w', encoding='utf-8') as f:    
                     json.dump(records, f, ensure_ascii=False) 
@@ -400,6 +404,7 @@ def game():
                     if event.key == K_ESCAPE:
                             running = False
                             main_menu()
+
             update = False   
 
 
@@ -551,6 +556,7 @@ def game():
         clock.tick(60)
 def main_menu():
     while True:
+        global one
         global generator
         global lose
         global update
@@ -595,6 +601,7 @@ def main_menu():
                 lost = 0
                 countdown = 10
                 count_collide = 0
+                one = 1
                 game()
 
 
